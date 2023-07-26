@@ -20,7 +20,7 @@ func init() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	reqContent := make([]byte, 0)
+	reqContent := make([]byte, r.ContentLength)
 	_, _ = r.Body.Read(reqContent)
 	logger.Printf("helloworld: received a request [%+v], content: [%s]\n", r.Body, reqContent)
 	target := os.Getenv("TARGET")
