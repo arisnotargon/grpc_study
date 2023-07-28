@@ -22,7 +22,7 @@ func init() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	reqContent := make([]byte, r.ContentLength)
 	_, _ = r.Body.Read(reqContent)
-	logger.Printf("helloworld: received a request [%+v], content: [%s]\n", r.Body, reqContent)
+	logger.Printf("helloworld: received a request [%+v], content: [%s]\n method===>%s", r.Body, reqContent, r.Method)
 	target := os.Getenv("TARGET")
 	if target == "" {
 		target = "World"
