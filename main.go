@@ -39,7 +39,7 @@ const (
 )
 
 const (
-	slackWebhook = "https://hooks.slack.com/services/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"
+	slackWebhook = "https://hooks.slack.com/services/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"
 )
 
 func init() {
