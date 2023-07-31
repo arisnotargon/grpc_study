@@ -65,7 +65,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Print(pm)
+	logger.Printf("pm:[%v]", pm)
 
 	switch pm.Subscription {
 	case webhookTopicName:
