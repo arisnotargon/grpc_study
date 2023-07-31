@@ -75,16 +75,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "test no ack")
 	case deadLetterTopicName:
 		logger.Printf("in deadLetterTopicName, PubSubMessage:[%v]", pm)
+		payload := []byte(
+			fmt.Sprintf(
+				`{"text":"subname:%s,messege body :%s,messege id: %s"}'`,
+				pm.Subscription,
+				base64.StdEncoding.EncodeToString(pm.Message.Data),
+				pm.Message.ID,
+			),
+		)
+		logger.Printf("slackWebhook: [%s]", payload)
+
 		restyReq := resty.New().R()
 		restyReq.SetHeader("Content-type", "application/json").
-			SetBody([]byte(
-				fmt.Sprintf(
-					`{"text":"subname:%s,messege body :%s,messege id: %s"}'`,
-					pm.Subscription,
-					base64.StdEncoding.EncodeToString(pm.Message.Data),
-					pm.Message.ID,
-				),
-			))
+			SetBody(payload)
 
 		response, err := restyReq.Post(slackWebhook)
 
