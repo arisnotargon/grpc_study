@@ -77,7 +77,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("in deadLetterTopicName, PubSubMessage:[%v]", pm)
 		payload := []byte(
 			fmt.Sprintf(
-				`{"text":"subname:%s,messege body :%s,messege id: %s"}'`,
+				`{"text":"subname:%s,messege body :%s,messege id: %s"}`,
 				pm.Subscription,
 				base64.StdEncoding.EncodeToString(pm.Message.Data),
 				pm.Message.ID,
