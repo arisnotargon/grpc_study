@@ -90,7 +90,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		response, err := restyReq.Post(slackWebhook)
 
-		logger.Printf("resty response:[%v], resty error:[%v]", response, err)
+		logger.Printf("slackWebhook url: %s ,resty response:[%v], resty error:[%v]", slackWebhook, response, err)
 
 		fmt.Fprintf(w, "ack")
 	default:
