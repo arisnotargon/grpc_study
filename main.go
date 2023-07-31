@@ -79,9 +79,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		restyReq.SetHeader("Content-type", "application/json").
 			SetBody([]byte(
 				fmt.Sprintf(
-					`{"text":"subname:%s,
-			messege body :%s,
-			 messege id: %s"}'`,
+					`{"text":"subname:%s,messege body :%s,messege id: %s"}'`,
 					pm.Subscription,
 					base64.StdEncoding.EncodeToString(pm.Message.Data),
 					pm.Message.ID,
