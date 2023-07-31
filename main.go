@@ -65,6 +65,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Print(pm)
+
 	switch pm.Subscription {
 	case webhookTopicName:
 		// test no ack
