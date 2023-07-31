@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -9,6 +10,34 @@ import (
 )
 
 var logger *log.Logger
+
+type PubSubMessage struct {
+	Message struct {
+		// data	如果定义为[]byte的话就会自动解析收到的base64
+		Data []byte `json:"data,omitempty"`
+		// Data string `json:"data,omitempty"`
+		ID string `json:"id"`
+	} `json:"message"`
+	Subscription string `json:"subscription"`
+}
+
+type MessageBody struct {
+	Endpoint string `json:"endpoint,omitempty"`
+	Headers  []struct {
+		Key   string `json:"key,omitempty"`
+		Value string `json:"value,omitempty"`
+	} `json:"headers,omitempty"`
+	Body []byte `json:"body,omitempty"`
+}
+
+const (
+	webhookTopicName    = "projects/horseman159753/subscriptions/test-topic-cloudrun-sub"
+	deadLetterTopicName = "projects/horseman159753/topics/test-dead-mq"
+)
+
+const (
+	slackWebhook = "https://hooks.slack.com/services/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"
+)
 
 func init() {
 	writer, err := os.OpenFile("log.txt", os.O_WRONLY|os.O_CREATE, 0755)
@@ -22,12 +51,27 @@ func init() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	reqContent := make([]byte, r.ContentLength)
 	_, _ = r.Body.Read(reqContent)
-	logger.Printf("helloworld: received a request [%+v], content: [%s]\n method===>%s", r.Body, reqContent, r.Method)
-	target := os.Getenv("TARGET")
-	if target == "" {
-		target = "World"
+
+	pm := &PubSubMessage{}
+
+	err := json.Unmarshal(reqContent, pm)
+	if err != nil {
+		logger.Fatalf("unmarshal_pubsubmessage_error,err : [%v], reqContent:%s", err, reqContent)
+		w.WriteHeader(500)
+		fmt.Fprintf(w, "unmarshal_pubsubmessage_error,err : %s\n", err.Error())
+		return
 	}
-	fmt.Fprintf(w, "Hello %s!\n", target)
+
+	switch pm.Subscription {
+	case webhookTopicName:
+		// test no ack
+		logger.Printf("in normal webhookTopicName, sub name : %s, msg id: %s", pm.Subscription, pm.Message.ID)
+		w.WriteHeader(500)
+		fmt.Fprintf(w, "test no ack")
+	case deadLetterTopicName:
+		logger.Printf("in deadLetterTopicName, PubSubMessage:[%v]", pm)
+		fmt.Fprintf(w, "ack")
+	}
 }
 
 func main() {
