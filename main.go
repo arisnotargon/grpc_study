@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/go-resty/resty/v2"
 )
 
 var logger *log.Logger
@@ -70,7 +73,28 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "test no ack")
 	case deadLetterTopicName:
 		logger.Printf("in deadLetterTopicName, PubSubMessage:[%v]", pm)
+		restyReq := resty.New().R()
+		restyReq.SetHeader("Content-type", "application/json").
+			SetBody([]byte(
+				fmt.Sprintf(
+					`{"text":"subname:%s,
+			messege body :%s,
+			 messege id: %s"}'`,
+					pm.Subscription,
+					base64.StdEncoding.EncodeToString(pm.Message.Data),
+					pm.Message.ID,
+				),
+			))
+
+		response, err := restyReq.Post(slackWebhook)
+
+		logger.Printf("resty response:[%v], resty error:[%v]", response, err)
+
 		fmt.Fprintf(w, "ack")
+	default:
+		logger.Fatalf("pm.Subscription error:%s", pm.Subscription)
+		w.WriteHeader(500)
+		fmt.Fprintf(w, "pm.Subscription error:%s", pm.Subscription)
 	}
 }
 
