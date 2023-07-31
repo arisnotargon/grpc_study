@@ -35,7 +35,7 @@ type MessageBody struct {
 
 const (
 	webhookTopicName    = "projects/horseman159753/subscriptions/test-topic-cloudrun-sub"
-	deadLetterTopicName = "projects/horseman159753/topics/test-dead-mq"
+	deadLetterTopicName = "projects/horseman159753/subscriptions/test-dead-mq-sub"
 )
 
 const (
